@@ -6,6 +6,18 @@ typedef struct {
     int y;
 } Coordinate;
 
+int isOnFire(char **forest, int x, int y){
+    return forest[x][y] == '1';
+}
+
+// Fonction pour mettre les cases en feu en cendres
+void turnToAshes(char **forest, Coordinate *fire_index, int num_fires) {
+    for (int i = 0; i < num_fires; i++) {
+        Coordinate current_fire = fire_index[i];
+        forest[current_fire.x][current_fire.y] = '2'; // Mettre la case en cendres
+    }
+}
+
 int main (){
 
     //Récupération des paramètres du fichier externe et vérification de ceux-ci
@@ -60,7 +72,7 @@ int main (){
     fire_index[num_fires].y = initial_fire_y;
     num_fires++;
 
-    // Affichage de la grille
+    // Affichage de la grille initiale
     printf("\nGrille de la forêt initiale :\n");
     for (int i = 0; i < length_h; i++) {
         for (int j = 0; j < length_l; j++) {
@@ -68,5 +80,28 @@ int main (){
         }
         printf("\n");
     }
+
+
+    char input; // initialisation de la variable d'entrée user
+
+    // boucle pour changer l'état des cases de la grille
+    do {
+
+        turnToAshes(forest, fire_index, num_fires);
+
+        // Affichage de la grille
+        printf("\nGrille de la forêt initiale :\n");
+        for (int i = 0; i < length_h; i++) {
+            for (int j = 0; j < length_l; j++) {
+                printf("%c ", forest[i][j]);
+            }
+            printf("\n");
+        }
+        printf("Tapez 'x' pour quitter ou une autre touche pour continuer");
+        scanf(" %c", &input);
+
+    } while (input != 'x'); // on sort de la boucle quand l'user tapoe x puis entrée
+
+
     return 0;
 }
