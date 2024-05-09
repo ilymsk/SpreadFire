@@ -1,8 +1,9 @@
 #include <stdio.h>
-
+#include <stdlib.h>
 
 int main (){
 
+    //Récupération des paramètres du fichier externe et vérification de ceux-ci
     FILE* params = NULL;
 
     params = fopen("params.txt", "r");
@@ -30,5 +31,26 @@ int main (){
     printf("initial_fire_x = %d\n", initial_fire_x);
     printf("initial_fire_y = %d\n", initial_fire_y);
 
+    //création de la grille qu'on remplit avec des 0 dans un premier temps
+
+    char **forest = (char **)malloc(length_h * sizeof(char *));
+    for (int i = 0; i < length_h; i++) {
+        forest[i] = (char *)malloc(length_l * sizeof(char));
+    }
+
+    for (int i = 0; i < length_h; i++) {
+        for (int j = 0; j < length_l; j++) {
+            forest[i][j] = '0';
+        }
+    }
+
+
+    printf("\nGrille de la forêt initiale :\n");
+    for (int i = 0; i < length_h; i++) {
+        for (int j = 0; j < length_l; j++) {
+            printf("%c ", forest[i][j]);
+        }
+        printf("\n");
+    }
     return 0;
 }
