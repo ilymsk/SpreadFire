@@ -17,6 +17,7 @@ void spreadFire(char **forest, int x, int y, int length_h, int length_l, float p
     int dx[] = {1, -1, 0, 0};
     int dy[] = {0, 0, 1, -1};
 
+    forest[x][y] = CENDRE;
     // Pour chaque cellule voisine
     for (int i = 0; i < 4; i++) {
         int new_x = x + dx[i];
@@ -97,40 +98,19 @@ int main (){
         printf("\n");
     }
 
-// Première propagation limitée du feu au début de la simulation
-    for (int i = 0; i < num_fires; i++) {
-        Coordinate current_fire = fire_index[i];
-        spreadFire(forest, current_fire.x, current_fire.y, length_h, length_l, probability_fire);
-    }
-
-
-// Affichage de la grille après la première propagation du feu
-    printf("\nGrille de la forêt après la première propagation du feu :\n");
-    for (int i = 0; i < length_h; i++) {
-        for (int j = 0; j < length_l; j++) {
-            printf("%c ", forest[i][j]);
-        }
-        printf("\n");
-    }
-
-
     char input; // initialisation de la variable d'entrée user
 
+    // Boucle principale de la simulation
     while (num_fires > 0) {
-        // pour chaque cellule en feu
-        for (int i = 0; i < length_h; i++) {
-            for (int j = 0; j < length_l; j++) {
-                if (forest[i][j] == FEU) {
-                    // eteindre le feu dans la cellule actuelle
-                    forest[i][j] = CENDRE;
-                    num_fires--;
-
-                    // Propager le feu aux cellules voisines avec une certaine probabilité
-                    spreadFire(forest, i, j, length_h, length_l, probability_fire);
-                }
-            }
+        // Pour chaque cellule en feu
+        for (int i = 0; i < num_fires; i++) {
+            Coordinate current_fire = fire_index[i];
+            spreadFire(forest, current_fire.x, current_fire.y, length_h, length_l, probability_fire);
         }
 
+        // Mettre à jour les cellules en feu pour les convertir en cendres
+        // et propager le feu aux cellules voisines
+        // Afficher la grille mise à jour
         printf("\nGrille de la forêt après cette étape de propagation du feu :\n");
         for (int i = 0; i < length_h; i++) {
             for (int j = 0; j < length_l; j++) {
@@ -139,9 +119,26 @@ int main (){
             printf("\n");
         }
 
-        // demande à l'utilisateur de taper une touche pour continuer ou 'x' pour quitter
+        // Réinitialiser le compteur de cellules en feu
+        num_fires = 0;
+        // Ajouter de nouvelles cellules en feu et mettre à jour le compteur
+        for (int i = 0; i < length_h; i++) {
+            for (int j = 0; j < length_l; j++) {
+                if (forest[i][j] == FEU) {
+                    fire_index[num_fires].x = i;
+                    fire_index[num_fires].y = j;
+                    num_fires++;
+                }
+            }
+        }
+
+        // Demander à l'utilisateur de taper une touche pour continuer ou 'x' pour quitter
         printf("Tapez 'x' pour quitter ou une autre touche pour continuer : ");
+        char input;
         scanf(" %c", &input);
+        if (input == 'x') {
+            break;
+        }
     }
 
     return 0;
