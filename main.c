@@ -1,25 +1,40 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
+
+#define BOIS '0'
+#define FEU '1'
+#define CENDRE '2'
 
 typedef struct {
     int x;
     int y;
 } Coordinate;
 
-int isOnFire(char **forest, int x, int y){
-    return forest[x][y] == '1';
-}
 
-// Fonction pour mettre les cases en feu en cendres
-void turnToAshes(char **forest, Coordinate *fire_index, int num_fires) {
-    for (int i = 0; i < num_fires; i++) {
-        Coordinate current_fire = fire_index[i];
-        forest[current_fire.x][current_fire.y] = '2'; // Mettre la case en cendres
+void spreadFire(char **forest, int x, int y, int length_h, int length_l, float probability_fire) {
+    // coordonnées des cellules voisines
+    int dx[] = {1, -1, 0, 0};
+    int dy[] = {0, 0, 1, -1};
+
+    // Pour chaque cellule voisine
+    for (int i = 0; i < 4; i++) {
+        int new_x = x + dx[i];
+        int new_y = y + dy[i];
+
+        // on vérifie si la cellule voisine est à l'intérieur de la grille
+        if (new_x >= 0 && new_x < length_h && new_y >= 0 && new_y < length_l) {
+            // Si la cellule voisine est du bois, la mettre en feu avec la probabilité de mise en feu
+            if (forest[new_x][new_y] == BOIS && (float)rand() / RAND_MAX < probability_fire) {
+                forest[new_x][new_y] = FEU;
+            }
+        }
     }
 }
 
-int main (){
 
+int main (){
+    srand(time(NULL));
     //Récupération des paramètres du fichier externe et vérification de ceux-ci
     FILE* params = NULL;
 
@@ -72,8 +87,25 @@ int main (){
     fire_index[num_fires].y = initial_fire_y;
     num_fires++;
 
-    // Affichage de la grille initiale
+
+// Affichage de la grille initiale
     printf("\nGrille de la forêt initiale :\n");
+    for (int i = 0; i < length_h; i++) {
+        for (int j = 0; j < length_l; j++) {
+            printf("%c ", forest[i][j]);
+        }
+        printf("\n");
+    }
+
+// Première propagation limitée du feu au début de la simulation
+    for (int i = 0; i < num_fires; i++) {
+        Coordinate current_fire = fire_index[i];
+        spreadFire(forest, current_fire.x, current_fire.y, length_h, length_l, probability_fire);
+    }
+
+
+// Affichage de la grille après la première propagation du feu
+    printf("\nGrille de la forêt après la première propagation du feu :\n");
     for (int i = 0; i < length_h; i++) {
         for (int j = 0; j < length_l; j++) {
             printf("%c ", forest[i][j]);
@@ -84,24 +116,33 @@ int main (){
 
     char input; // initialisation de la variable d'entrée user
 
-    // boucle pour changer l'état des cases de la grille
-    do {
+    while (num_fires > 0) {
+        // pour chaque cellule en feu
+        for (int i = 0; i < length_h; i++) {
+            for (int j = 0; j < length_l; j++) {
+                if (forest[i][j] == FEU) {
+                    // eteindre le feu dans la cellule actuelle
+                    forest[i][j] = CENDRE;
+                    num_fires--;
 
-        turnToAshes(forest, fire_index, num_fires);
+                    // Propager le feu aux cellules voisines avec une certaine probabilité
+                    spreadFire(forest, i, j, length_h, length_l, probability_fire);
+                }
+            }
+        }
 
-        // Affichage de la grille
-        printf("\nGrille de la forêt initiale :\n");
+        printf("\nGrille de la forêt après cette étape de propagation du feu :\n");
         for (int i = 0; i < length_h; i++) {
             for (int j = 0; j < length_l; j++) {
                 printf("%c ", forest[i][j]);
             }
             printf("\n");
         }
-        printf("Tapez 'x' pour quitter ou une autre touche pour continuer");
+
+        // demande à l'utilisateur de taper une touche pour continuer ou 'x' pour quitter
+        printf("Tapez 'x' pour quitter ou une autre touche pour continuer : ");
         scanf(" %c", &input);
-
-    } while (input != 'x'); // on sort de la boucle quand l'user tapoe x puis entrée
-
+    }
 
     return 0;
 }
