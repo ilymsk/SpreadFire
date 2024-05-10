@@ -141,5 +141,12 @@ int main (){
         }
     }
 
+    // Libérer la mémoire allouée
+    for (int i = 0; i < length_h; i++) {
+        free(forest[i]);
+    }
+    free(forest);
+    free(fire_index);
+
     return 0;
 }

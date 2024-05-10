@@ -1,5 +1,5 @@
-length_l = 10
-length_h = 10
-probability_fire = 0.3
-initial_fire_x = 5
-initial_fire_y = 5
+length_l = 5
+length_h = 5
+probability_fire = 0.6
+initial_fire_x = 2
+initial_fire_y = 2
